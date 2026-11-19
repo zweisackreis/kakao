@@ -370,9 +370,15 @@ footer{color:var(--muted);font-size:.82rem;padding:20px 0 50px}
   <div class="badges" id="badges"></div>
   <dl class="summary" id="summary"></dl>
   <div class="btnrow noprint">
-    <button class="btn green" onclick="window.print()">🖨 Drucken / als PDF speichern</button>
+    <button class="btn green" id="btnPrint">🖨 Drucken / als PDF</button>
+    <button class="btn" id="btnSave">⬇ Ergebnis herunterladen</button>
+    <button class="btn" id="btnShare" style="display:none">📤 Teilen</button>
     <button class="btn ghost" id="resetAll">Alles zurücksetzen</button>
   </div>
+  <p class="hint noprint" id="printHint" style="display:none;margin-top:12px">
+    Kein Druckfenster erschienen? Das passiert, wenn die Seite in einer App geöffnet wurde (z. B. Schul-App, Teams, Moodle, Mail).
+    Öffne die Seite dann direkt in <b>Safari</b> bzw. <b>Chrome</b> – oder tippe auf <b>„Ergebnis herunterladen“</b> und drucke die Datei von dort.
+  </p>
 </section>
 
 <footer>
@@ -838,6 +844,54 @@ document.querySelectorAll("[data-reset]").forEach(b=>b.onclick=()=>{
   else bucketState[k].reset();
   document.getElementById("fb-"+k).textContent="";
 });
+/* ================= Drucken / Speichern / Teilen (tablet-tauglich) ================= */
+function resultHTML(){
+  const sec=document.getElementById("result").cloneNode(true);
+  sec.querySelectorAll(".noprint").forEach(n=>n.remove());
+  const css=document.querySelector("style").textContent;
+  return `<!DOCTYPE html><html lang="de"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Ergebnis ${esc(S.name||"")} – Wer bestimmt, wer ich bin?</title><style>${css}</style></head>
+<body><main class="wrap"><p style="color:#5c6b78;font-size:.85rem;margin-top:20px">Online-Arbeitsblatt „Wer bestimmt, wer ich bin?“ · ${new Date().toLocaleDateString("de-DE")}</p>
+${sec.outerHTML}<p class="noprint" style="text-align:center"><button class="btn green" onclick="window.print()">🖨 Drucken / als PDF</button></p></main></body></html>`;
+}
+function resultText(){
+  renderResult();
+  const s=document.getElementById("summary");
+  return `Wer bestimmt, wer ich bin? – Ergebnis\n${document.getElementById("resline").innerText}\n\n` +
+    [...s.querySelectorAll("dt")].map(dt=>{ const dd=dt.nextElementSibling; return dt.innerText+":\n"+(dd?dd.innerText:""); }).join("\n\n");
+}
+document.getElementById("btnPrint").onclick=()=>{
+  renderResult();
+  const hint=document.getElementById("printHint");
+  // In App-Browsern (WebViews) existiert print() oft nicht oder tut nichts → Hinweis zeigen
+  try{
+    if(typeof window.print!=="function"){ hint.style.display="block"; return; }
+    const t=Date.now(); window.print();
+    // Ein echter Druckdialog blockiert meist; kehrt print() sofort zurück, kam evtl. keiner
+    if(Date.now()-t<400) setTimeout(()=>{ hint.style.display="block"; }, 1200);
+  }catch(e){ hint.style.display="block"; }
+};
+document.getElementById("btnSave").onclick=()=>{
+  renderResult();
+  const fn=`Ergebnis_${(S.name||"Identitaet").replace(/[^\wäöüÄÖÜß-]/g,"_")}.html`;
+  const blob=new Blob([resultHTML()],{type:"text/html"});
+  const url=URL.createObjectURL(blob);
+  const a=document.createElement("a"); a.href=url; a.download=fn; document.body.appendChild(a); a.click(); a.remove();
+  setTimeout(()=>URL.revokeObjectURL(url), 4000);
+  toast("Ergebnis gespeichert");
+};
+if(navigator.share){
+  const sb=document.getElementById("btnShare"); sb.style.display="";
+  sb.onclick=async()=>{
+    const fn=`Ergebnis_${(S.name||"Identitaet").replace(/[^\wäöüÄÖÜß-]/g,"_")}.html`;
+    try{
+      const file=new File([resultHTML()],fn,{type:"text/html"});
+      if(navigator.canShare && navigator.canShare({files:[file]})) await navigator.share({files:[file], title:"Mein Ergebnis"});
+      else await navigator.share({title:"Mein Ergebnis", text:resultText()});
+    }catch(e){ /* abgebrochen */ }
+  };
+}
+
 document.getElementById("resetAll").onclick=()=>{
   if(!confirm("Wirklich alles löschen und neu anfangen?")) return;
   try{ localStorage.removeItem(KEY); }catch(e){} location.hash=""; location.reload();
