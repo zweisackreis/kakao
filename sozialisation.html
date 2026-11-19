@@ -1,0 +1,882 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Wer bestimmt, wer ich bin? – Online-Arbeitsblatt Klasse 8</title>
+<style>
+:root{
+  --blue:#4f8fb8; --blue-d:#2c6a92; --purple:#7a2a73; --yellow:#f0b323; --red:#d9473b;
+  --orange:#dc7a2b; --green:#7ab648; --green-d:#4f8a2a; --ink:#1f2a35; --muted:#5c6b78;
+  --bg:#f4f1ea; --card:#fff; --line:#e1dccf; --ok:#2e9d5b; --bad:#d9473b; --r:16px;
+}
+*{box-sizing:border-box}
+html{scroll-behavior:smooth}
+body{margin:0;font-family:system-ui,-apple-system,"Segoe UI",Roboto,"Helvetica Neue",Arial,sans-serif;
+  color:var(--ink);background:var(--bg);line-height:1.5;font-size:17px}
+button{font:inherit;cursor:pointer}
+h1,h2,h3{line-height:1.2;margin:0 0 .5em}
+a{color:var(--blue-d)}
+.wrap{max-width:900px;margin:0 auto;padding:0 16px}
+
+/* Top bar */
+.topbar{position:sticky;top:0;z-index:50;background:rgba(255,255,255,.95);backdrop-filter:blur(6px);
+  border-bottom:1px solid var(--line)}
+.topbar .wrap{display:flex;align-items:center;gap:14px;padding-top:10px;padding-bottom:10px;flex-wrap:wrap}
+.brand{font-weight:800;font-size:1rem;white-space:nowrap}
+.xp{flex:1;min-width:160px;display:flex;align-items:center;gap:10px}
+.xpbar{flex:1;height:14px;background:#ece7db;border-radius:99px;overflow:hidden}
+.xpfill{height:100%;width:0;background:linear-gradient(90deg,var(--yellow),var(--orange));transition:width .6s}
+.xpnum{font-weight:700;font-variant-numeric:tabular-nums;white-space:nowrap}
+.map{display:flex;gap:6px;flex-wrap:wrap}
+.map a{display:grid;place-items:center;width:34px;height:34px;border-radius:50%;background:#ece7db;
+  color:var(--ink);text-decoration:none;font-weight:700;font-size:.9rem;border:2px solid transparent}
+.map a.done{background:var(--green);color:#fff}
+.map a:hover{border-color:var(--blue)}
+
+/* Hero */
+.hero{padding:40px 0 20px}
+.hero h1{font-size:clamp(1.8rem,5vw,2.8rem);color:var(--blue-d)}
+.hero p{font-size:1.1rem;color:var(--muted);max-width:640px}
+.namebox{display:flex;gap:10px;flex-wrap:wrap;margin-top:16px;align-items:center}
+.namebox input{padding:12px 14px;border:2px solid var(--line);border-radius:12px;font:inherit;min-width:220px}
+.ichgraph{display:flex;justify-content:center;margin:20px 0 4px}
+
+/* Stations */
+.station{background:var(--card);border-radius:var(--r);padding:28px clamp(16px,4vw,32px);margin:28px 0;
+  box-shadow:0 2px 0 var(--line);scroll-margin-top:80px;border-top:8px solid var(--c,var(--blue))}
+.station-head{display:flex;align-items:center;gap:14px;margin-bottom:10px}
+.badge-num{flex:none;width:52px;height:52px;border-radius:14px;background:var(--c,var(--blue));color:#fff;
+  display:grid;place-items:center;font-weight:800;font-size:1.4rem}
+.station-head h2{margin:0;font-size:1.5rem}
+.station-head small{display:block;color:var(--muted);font-weight:600;letter-spacing:.02em;text-transform:uppercase;font-size:.75rem}
+.task{border:2px dashed var(--line);border-radius:14px;padding:18px;margin:20px 0}
+.task h3{font-size:1.1rem;display:flex;gap:8px;align-items:baseline}
+.task h3 .tag{font-size:.72rem;background:var(--c,var(--blue));color:#fff;padding:2px 8px;border-radius:99px;
+  text-transform:uppercase;letter-spacing:.04em;flex:none}
+.hint{color:var(--muted);font-size:.93rem;margin:-4px 0 12px}
+.btnrow{display:flex;gap:10px;flex-wrap:wrap;margin-top:14px;align-items:center}
+.btn{border:0;border-radius:12px;padding:11px 18px;font-weight:700;background:var(--blue);color:#fff;
+  box-shadow:0 3px 0 var(--blue-d);transition:transform .08s;text-decoration:none;display:inline-block}
+.btn:active{transform:translateY(2px);box-shadow:0 1px 0 var(--blue-d)}
+.btn.ghost{background:#ece7db;color:var(--ink);box-shadow:0 3px 0 #d3ccbb}
+.btn.green{background:var(--green);box-shadow:0 3px 0 var(--green-d)}
+.feedback{font-weight:600;min-height:1.4em}
+.feedback.ok{color:var(--ok)} .feedback.bad{color:var(--bad)}
+
+/* Story cards */
+.story{display:grid;gap:10px}
+.scene{display:flex;gap:12px;align-items:flex-start;background:#faf8f3;border:1px solid var(--line);
+  border-radius:12px;padding:12px 14px}
+.scene .time{flex:none;font-weight:800;color:var(--blue-d);min-width:78px;font-size:.9rem}
+.scene .ctrl{margin-left:auto;display:flex;flex-direction:column;gap:4px}
+.scene .ctrl button{border:0;background:#ece7db;border-radius:8px;width:34px;height:28px;font-weight:800}
+.scene.right{border-color:var(--ok);background:#eef8f1}
+.scene.wrong{border-color:var(--bad);background:#fdf0ee}
+.reveal{display:none}
+.reveal.show{display:block}
+
+/* Chips & buckets */
+.pool{display:flex;flex-wrap:wrap;gap:8px;min-height:54px;padding:10px;border-radius:12px;background:#faf8f3;
+  border:1px solid var(--line)}
+.chip{background:#fff;border:2px solid var(--line);border-radius:12px;padding:8px 12px;font-size:.95rem;
+  user-select:none;-webkit-user-select:none;touch-action:manipulation;cursor:grab;max-width:100%}
+.chip.sel{border-color:var(--blue);box-shadow:0 0 0 3px rgba(79,143,184,.3)}
+.chip.right{border-color:var(--ok);background:#eef8f1}
+.chip.wrong{border-color:var(--bad);background:#fdf0ee}
+.chip .why{display:block;font-size:.82rem;color:var(--muted);margin-top:4px}
+.buckets{display:grid;gap:12px;margin-top:12px;grid-template-columns:repeat(auto-fit,minmax(200px,1fr))}
+.bucket{border-radius:14px;padding:10px;min-height:120px;border:3px solid var(--bc,var(--blue));background:#fff;
+  display:flex;flex-direction:column;gap:8px;transition:background .15s}
+.bucket.armed{background:#f2f8fc;cursor:pointer}
+.bucket.over{background:#e6f1f8}
+.bucket h4{margin:0;color:var(--bc,var(--blue));font-size:1rem;display:flex;gap:6px;align-items:center}
+.bucket .items{display:flex;flex-direction:column;gap:6px}
+
+/* Matching selects */
+.match{display:grid;gap:10px}
+.match .row{display:grid;grid-template-columns:minmax(120px,190px) 1fr;gap:10px;align-items:center}
+.match .val{font-weight:800;padding:10px 12px;border-radius:12px;color:#fff;text-align:center}
+.match select{width:100%;padding:10px;border-radius:10px;border:2px solid var(--line);font:inherit;background:#fff}
+.match select.right{border-color:var(--ok);background:#eef8f1}
+.match select.wrong{border-color:var(--bad);background:#fdf0ee}
+@media(max-width:560px){.match .row{grid-template-columns:1fr}}
+
+/* Cloze */
+.cloze{font-size:1.05rem;line-height:2.2}
+.gap{display:inline-block;min-width:120px;border-bottom:3px solid var(--blue);padding:0 8px;margin:0 2px;
+  border-radius:6px 6px 0 0;background:#f2f8fc;text-align:center;cursor:pointer;line-height:1.6;color:var(--blue-d);font-weight:700}
+.gap.sel{background:#fff4d6;border-color:var(--yellow)}
+.gap.right{background:#eef8f1;border-color:var(--ok);color:var(--ok)}
+.gap.wrong{background:#fdf0ee;border-color:var(--bad);color:var(--bad)}
+.bank{display:flex;flex-wrap:wrap;gap:8px;margin-top:12px}
+.bank .chip.used{opacity:.35;pointer-events:none}
+
+/* Options */
+.opts{display:grid;gap:8px}
+.opt{display:flex;gap:10px;align-items:center;border:2px solid var(--line);border-radius:12px;padding:10px 12px;cursor:pointer;background:#fff}
+.opt input{width:20px;height:20px;accent-color:var(--blue)}
+.opt.right{border-color:var(--ok);background:#eef8f1}
+.opt.wrong{border-color:var(--bad);background:#fdf0ee}
+.opt.missed{border-color:var(--yellow);background:#fff8e6}
+
+/* Video */
+.video{position:relative;aspect-ratio:16/9;border-radius:14px;overflow:hidden;background:#1f2a35;margin:10px 0}
+.video iframe{position:absolute;inset:0;width:100%;height:100%;border:0}
+.vposter{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;
+  gap:10px;color:#fff;text-align:center;padding:20px;cursor:pointer;background:linear-gradient(135deg,#2c6a92,#7a2a73)}
+.vposter .play{width:72px;height:72px;border-radius:50%;background:rgba(255,255,255,.95);display:grid;place-items:center}
+.vposter .play::after{content:"";border-left:24px solid var(--red);border-top:15px solid transparent;border-bottom:15px solid transparent;margin-left:6px}
+.vposter small{opacity:.85;max-width:460px;font-size:.8rem}
+.vmeta{font-size:.88rem;color:var(--muted)}
+
+/* Blitz */
+.blitz{text-align:center}
+.bcard{font-size:1.25rem;font-weight:700;padding:30px 20px;border-radius:16px;background:#faf8f3;border:2px solid var(--line);
+  min-height:130px;display:grid;place-items:center;margin:10px 0}
+.bcard.ok{background:#eef8f1;border-color:var(--ok)} .bcard.no{background:#fdf0ee;border-color:var(--bad)}
+.bbtns{display:flex;gap:12px;justify-content:center}
+.bbtns .btn{min-width:140px;font-size:1.1rem;padding:14px}
+.streak{font-weight:800;color:var(--orange)}
+
+/* Diagram builder */
+.builder{display:grid;gap:10px}
+.brow{display:grid;grid-template-columns:150px 1fr 1.3fr;gap:10px;align-items:center}
+.brow input[type=text]{padding:9px;border-radius:10px;border:2px solid var(--line);font:inherit;width:100%}
+.brow input[type=range]{width:100%}
+.brow .lbl{font-weight:700;color:#fff;padding:8px;border-radius:10px;text-align:center}
+.brow .lbl input{background:transparent;border:0;color:#fff;font:inherit;font-weight:700;width:100%;text-align:center}
+.brow .lbl input::placeholder{color:rgba(255,255,255,.8)}
+@media(max-width:620px){.brow{grid-template-columns:1fr}}
+#myDiagram{width:100%;max-width:640px;display:block;margin:10px auto}
+
+/* Barometer */
+.baro{display:flex;align-items:center;gap:12px;flex-wrap:wrap}
+.baro input{flex:1;min-width:200px;accent-color:var(--purple)}
+.baro span{font-weight:700;font-size:.92rem}
+textarea{width:100%;min-height:90px;padding:10px;border-radius:12px;border:2px solid var(--line);font:inherit;resize:vertical}
+.dilemma{background:#faf8f3;border:1px solid var(--line);border-radius:12px;padding:14px;margin:10px 0}
+.dilemma .choices{display:flex;gap:8px;flex-wrap:wrap;margin:8px 0}
+.dilemma .choices button{border:2px solid var(--line);background:#fff;border-radius:10px;padding:8px 12px}
+.dilemma .choices button.on{border-color:var(--purple);background:#f6eaf5;font-weight:700}
+
+/* Result */
+.badges{display:flex;gap:12px;flex-wrap:wrap;margin:12px 0}
+.bdg{display:flex;align-items:center;gap:8px;border-radius:99px;padding:6px 14px 6px 6px;background:#ece7db;color:var(--muted);font-weight:700;font-size:.9rem}
+.bdg i{width:30px;height:30px;border-radius:50%;display:grid;place-items:center;background:#d3ccbb;font-style:normal}
+.bdg.on{background:#fff4d6;color:var(--ink)} .bdg.on i{background:var(--yellow)}
+.summary{background:#faf8f3;border-radius:12px;padding:14px;border:1px solid var(--line)}
+.summary dt{font-weight:800;margin-top:8px} .summary dd{margin:2px 0 0}
+
+.toast{position:fixed;left:50%;bottom:24px;transform:translateX(-50%) translateY(120px);background:var(--ink);color:#fff;
+  padding:12px 20px;border-radius:99px;font-weight:700;transition:transform .35s;z-index:100}
+.toast.show{transform:translateX(-50%) translateY(0)}
+#confetti{position:fixed;inset:0;pointer-events:none;z-index:99}
+footer{color:var(--muted);font-size:.82rem;padding:20px 0 50px}
+
+@media print{
+  body{background:#fff;font-size:12pt}
+  .topbar,.btnrow,.video,.namebox .btn,#confetti,.toast,.noprint{display:none!important}
+  .station{box-shadow:none;border:1px solid #ccc;break-inside:avoid-page}
+  .reveal{display:block!important}
+}
+</style>
+</head>
+<body>
+
+<div class="topbar">
+  <div class="wrap">
+    <div class="brand">🧭 Wer bestimmt, wer ich bin?</div>
+    <div class="xp"><div class="xpbar"><div class="xpfill" id="xpfill"></div></div><div class="xpnum"><span id="xp">0</span> / <span id="xpmax">0</span> XP</div></div>
+    <nav class="map" id="map"></nav>
+  </div>
+</div>
+
+<main class="wrap">
+
+<header class="hero">
+  <h1>Wer bestimmt, wer ich bin?</h1>
+  <p>Wie entstehen unsere Werte – und wie stark beeinflussen uns Eltern, Freunde, Vorbilder und soziale Medien? In sechs Stationen findest du es heraus. Für jede richtige Lösung bekommst du XP. Am Ende kannst du dein Ergebnis ausdrucken oder als PDF speichern.</p>
+  <div class="namebox">
+    <label for="name"><b>Dein Name:</b></label>
+    <input id="name" type="text" placeholder="Vorname" autocomplete="off">
+    <a class="btn" href="#s1">Los geht's →</a>
+  </div>
+  <div class="ichgraph" aria-hidden="true">
+    <svg viewBox="0 0 520 200" width="100%" style="max-width:520px">
+      <defs><marker id="ah" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="5" markerHeight="5" orient="auto-start-reverse"><path d="M0,0 L10,5 L0,10 z" fill="#888"/></marker></defs>
+      <g stroke="#888" stroke-width="5" marker-end="url(#ah)">
+        <line x1="260" y1="40" x2="260" y2="110"/><line x1="140" y1="55" x2="215" y2="120"/>
+        <line x1="380" y1="55" x2="305" y2="120"/><line x1="100" y1="160" x2="200" y2="148"/><line x1="420" y1="160" x2="320" y2="148"/>
+      </g>
+      <rect x="215" y="4" width="90" height="36" rx="8" fill="#f0b323"/><text x="260" y="27" text-anchor="middle" fill="#fff" font-weight="700" font-size="14">Eltern</text>
+      <rect x="70" y="30" width="100" height="36" rx="8" fill="#7a2a73"/><text x="120" y="53" text-anchor="middle" fill="#fff" font-weight="700" font-size="14">Freunde</text>
+      <rect x="350" y="30" width="100" height="36" rx="8" fill="#d9473b"/><text x="400" y="53" text-anchor="middle" fill="#fff" font-weight="700" font-size="14">Vorbilder</text>
+      <rect x="10" y="142" width="96" height="40" rx="8" fill="#dc7a2b"/><text x="58" y="167" text-anchor="middle" fill="#fff" font-weight="700" font-size="13">soz. Medien</text>
+      <rect x="414" y="142" width="96" height="40" rx="8" fill="#7ab648"/><text x="462" y="168" text-anchor="middle" fill="#fff" font-weight="700" font-size="18">…</text>
+      <ellipse cx="260" cy="150" rx="62" ry="38" fill="#4f8fb8"/><text x="260" y="157" text-anchor="middle" fill="#fff" font-weight="800" font-size="20">Ich</text>
+    </svg>
+  </div>
+</header>
+
+<!-- ============ STATION 1 ============ -->
+<section class="station" id="s1" style="--c:var(--blue)">
+  <div class="station-head"><div class="badge-num">1</div><div><small>Fallbeispiel</small><h2>Ein ganz normaler Tag in Mias Leben</h2></div></div>
+  <p>Mia ist 14. Ihr Tag ist ziemlich voll – und viele Menschen wollen etwas von ihr. Aber durcheinandergeraten ist er auch: Die Szenen sind gemischt!</p>
+
+  <div class="task">
+    <h3><span class="tag">Sortieren</span> Bring Mias Tag in die richtige Reihenfolge</h3>
+    <p class="hint">Lies die Szenen genau und verschiebe sie mit ▲ und ▼. Tipp: Achte auf die Uhrzeiten und auf Hinweise wie „später“ oder „nach der Schule“.</p>
+    <div class="story" id="order"></div>
+    <div class="btnrow"><button class="btn" data-check="order">Prüfen</button><span class="feedback" id="fb-order"></span></div>
+  </div>
+
+  <div class="task">
+    <h3><span class="tag">Zuordnen</span> Wer erwartet was von Mia?</h3>
+    <p class="hint">Ziehe jede Erwartung zu der Person oder Gruppe, von der sie kommt. Auf dem Tablet: erst Karte antippen, dann das Feld antippen.</p>
+    <div id="expect"></div>
+    <div class="btnrow"><button class="btn" data-check="expect">Prüfen</button><button class="btn ghost" data-reset="expect">Zurücksetzen</button><span class="feedback" id="fb-expect"></span></div>
+  </div>
+
+  <div class="task">
+    <h3><span class="tag">Belege finden</span> Welche Werte sind Mia wichtig?</h3>
+    <p class="hint">Wähle für jeden Wert die Textstelle aus, die ihn am besten belegt.</p>
+    <div class="match" id="values"></div>
+    <div class="btnrow"><button class="btn" data-check="values">Prüfen</button><span class="feedback" id="fb-values"></span></div>
+  </div>
+
+  <div class="task">
+    <h3><span class="tag">Nachdenken</span> Und du?</h3>
+    <p class="hint">Was ist bei dir ähnlich wie bei Mia, was ist anders? Schreib je einen Satz.</p>
+    <textarea id="t-compare" data-save placeholder="Ähnlich ist … / Anders ist …"></textarea>
+  </div>
+</section>
+
+<!-- ============ STATION 2 ============ -->
+<section class="station" id="s2" style="--c:var(--purple)">
+  <div class="station-head"><div class="badge-num">2</div><div><small>Begriffe klären</small><h2>Was ist eigentlich „Identität“?</h2></div></div>
+  <p>„Wer bin ich, was macht mich aus, wie sehen mich andere?“ – Solche Fragen stellt sich nicht nur Mia. Sie drehen sich alle um die eigene <b>Identität</b>.</p>
+
+  <div class="task">
+    <h3><span class="tag">Video</span> Wer bin ich?</h3>
+    <div class="video" data-yt="AH5gtVpXCNI" data-title="IDENTITÄT – Kanal „Was war das nochmal?“"></div>
+    <p class="vmeta">Video: „IDENTITÄT“, YouTube-Kanal <i>Was war das nochmal?</i> · <a href="https://www.youtube.com/watch?v=AH5gtVpXCNI" target="_blank" rel="noopener">auf YouTube öffnen</a></p>
+    <p><b>Welche drei Spannungsfelder stellt das Video vor?</b> Kreuze genau drei an.</p>
+    <div class="opts" id="vq1"></div>
+    <div class="btnrow"><button class="btn" data-check="vq1">Prüfen</button><span class="feedback" id="fb-vq1"></span></div>
+  </div>
+
+  <div class="task">
+    <h3><span class="tag">Lückentext</span> Zwei Seiten der Identität</h3>
+    <p class="hint">Tippe eine Lücke an und wähle dann das passende Wort aus der Wortkiste. (Am Computer kannst du die Wörter auch in die Lücken ziehen.) Achtung: Zwei Wörter bleiben übrig!</p>
+    <div class="cloze" id="cloze"></div>
+    <div class="bank" id="bank"></div>
+    <div class="btnrow"><button class="btn" data-check="cloze">Prüfen</button><button class="btn ghost" data-reset="cloze">Zurücksetzen</button><span class="feedback" id="fb-cloze"></span></div>
+  </div>
+</section>
+
+<!-- ============ STATION 3 ============ -->
+<section class="station" id="s3" style="--c:var(--red)">
+  <div class="station-head"><div class="badge-num">3</div><div><small>Anwenden</small><h2>Ich-Identität oder soziale Identität?</h2></div></div>
+  <p><b>Ich-Identität</b> = „Was will <i>ich</i>?“ &nbsp;·&nbsp; <b>Soziale Identität</b> = „Was wollen <i>andere</i> von mir?“</p>
+  <div class="task">
+    <h3><span class="tag">Sortierspiel</span> Welche Seite zeigt sich hier?</h3>
+    <p class="hint">Ordne jede Situation einer Seite zu. Nach dem Prüfen siehst du bei jeder Karte eine kurze Erklärung.</p>
+    <div id="idsort"></div>
+    <div class="btnrow"><button class="btn" data-check="idsort">Prüfen</button><button class="btn ghost" data-reset="idsort">Zurücksetzen</button><span class="feedback" id="fb-idsort"></span></div>
+  </div>
+</section>
+
+<!-- ============ STATION 4 ============ -->
+<section class="station" id="s4" style="--c:var(--orange)">
+  <div class="station-head"><div class="badge-num">4</div><div><small>Schaubild</small><h2>Wer wirkt auf das „Ich“ ein?</h2></div></div>
+  <p>Das Schaubild oben zeigt: Viele Menschen und Medien beeinflussen, wer wir werden. Fachleute nennen das <b>Sozialisation</b>. Die Gruppen, die uns prägen, heißen <b>Sozialisationsinstanzen</b>.</p>
+
+  <div class="task">
+    <h3><span class="tag">Video</span> Sozialisation in 3½ Minuten</h3>
+    <div class="video" data-yt="TwoAur3GP1w" data-title="SOZIALISATION einfach erklärt – Erzieherkanal"></div>
+    <p class="vmeta">Video: „SOZIALISATION einfach erklärt“ (3:31 Min.), YouTube-Kanal <i>Erzieherkanal</i> · <a href="https://www.youtube.com/watch?v=TwoAur3GP1w" target="_blank" rel="noopener">auf YouTube öffnen</a></p>
+    <p><b>Wo findet die erste (primäre) Sozialisation statt?</b></p>
+    <div class="opts" id="vq2"></div>
+    <p style="margin-top:14px"><b>Wann ist die Sozialisation abgeschlossen?</b></p>
+    <div class="opts" id="vq3"></div>
+    <div class="btnrow"><button class="btn" data-check="vq23">Prüfen</button><span class="feedback" id="fb-vq23"></span></div>
+  </div>
+
+  <div class="task">
+    <h3><span class="tag">Auswählen</span> Was könnte im grünen Kästchen „…“ stehen?</h3>
+    <p class="hint">Wähle alle Personen oder Gruppen aus, die Mias Identität ebenfalls beeinflussen – denk an ihren Tag!</p>
+    <div class="opts" id="more"></div>
+    <div class="btnrow"><button class="btn" data-check="more">Prüfen</button><span class="feedback" id="fb-more"></span></div>
+  </div>
+
+  <div class="task">
+    <h3><span class="tag">Gestalten</span> Dein eigenes Einfluss-Schaubild</h3>
+    <p class="hint">Wie stark beeinflussen dich diese Gruppen? Stelle mit dem Regler ein (0 = gar nicht, 5 = sehr stark) und notiere ein konkretes Beispiel. Die Pfeile in deinem Schaubild werden dicker, je stärker der Einfluss ist. Im letzten Feld darfst du selbst etwas eintragen.</p>
+    <div class="builder" id="builder"></div>
+    <svg id="myDiagram" viewBox="0 0 640 360" role="img" aria-label="Mein Einfluss-Schaubild"></svg>
+  </div>
+</section>
+
+<!-- ============ STATION 5 ============ -->
+<section class="station" id="s5" style="--c:var(--yellow)">
+  <div class="station-head"><div class="badge-num">5</div><div><small>Blitzrunde</small><h2>Richtig oder falsch?</h2></div></div>
+  <p>Acht Aussagen, schnelle Entscheidung! Für richtige Antworten in Folge gibt es eine Serie 🔥 – und Bonus-XP.</p>
+  <div class="task blitz" id="blitz">
+    <div>Frage <b id="bnum">1</b> / <span id="btot">8</span> &nbsp;·&nbsp; Serie: <span class="streak" id="bstreak">0</span></div>
+    <div class="bcard" id="bcard">…</div>
+    <div class="bbtns" id="bbtns">
+      <button class="btn green" data-tf="1">✔ Richtig</button>
+      <button class="btn" style="background:var(--red);box-shadow:0 3px 0 #a3332a" data-tf="0">✘ Falsch</button>
+    </div>
+    <p class="feedback" id="fb-blitz"></p>
+    <div class="btnrow" style="justify-content:center"><button class="btn ghost" id="brestart">Nochmal spielen</button></div>
+  </div>
+</section>
+
+<!-- ============ STATION 6 ============ -->
+<section class="station" id="s6" style="--c:var(--green)">
+  <div class="station-head"><div class="badge-num">6</div><div><small>Diskutieren</small><h2>Eigener Weg oder Erwartungen erfüllen?</h2></div></div>
+
+  <div class="task">
+    <h3><span class="tag">Zuordnen</span> Zu viel des Guten</h3>
+    <p class="hint">Was kann passieren, wenn eine Seite der Identität <i>zu stark</i> ausgeprägt ist? Ordne die Folgen zu.</p>
+    <div id="toomuch"></div>
+    <div class="btnrow"><button class="btn" data-check="toomuch">Prüfen</button><button class="btn ghost" data-reset="toomuch">Zurücksetzen</button><span class="feedback" id="fb-toomuch"></span></div>
+  </div>
+
+  <div class="task">
+    <h3><span class="tag">Entscheiden</span> Was würdest du tun?</h3>
+    <p class="hint">Hier gibt es kein Richtig oder Falsch. Entscheide dich und begründe kurz.</p>
+    <div id="dilemmas"></div>
+  </div>
+
+  <div class="task">
+    <h3><span class="tag">Meinungsbarometer</span> Was ist dir wichtiger?</h3>
+    <div class="baro">
+      <span>🧭 Meinen eigenen Weg gehen</span>
+      <input type="range" id="baro" min="0" max="10" value="5" data-save>
+      <span>Erwartungen anderer erfüllen 🤝</span>
+    </div>
+    <p class="hint" style="margin-top:12px">Begründe deine Position mit mindestens zwei Argumenten. Diese Notizen sind die Grundlage für eure Gruppendiskussion und euer Plakat.</p>
+    <textarea id="t-opinion" data-save placeholder="Mir ist wichtiger …, weil … Außerdem …"></textarea>
+  </div>
+</section>
+
+<!-- ============ RESULT ============ -->
+<section class="station" id="result" style="--c:var(--blue-d)">
+  <div class="station-head"><div class="badge-num">★</div><div><small>Geschafft?</small><h2>Dein Ergebnis</h2></div></div>
+  <p id="resline">Bearbeite die Stationen – hier erscheint dann deine Auswertung.</p>
+  <div class="badges" id="badges"></div>
+  <dl class="summary" id="summary"></dl>
+  <div class="btnrow noprint">
+    <button class="btn green" onclick="window.print()">🖨 Drucken / als PDF speichern</button>
+    <button class="btn ghost" id="resetAll">Alles zurücksetzen</button>
+  </div>
+</section>
+
+<footer>
+  Grundlage: Schulbuchmaterial M5–M7 „Wer bestimmt, wer wir sind?“ (Fallbeispiel Mia, Text zu Identität, Schaubild). Fallbeispiel hier gekürzt und nacherzählt.
+  Videos werden erst nach Klick von YouTube (youtube-nocookie.com) geladen. Dein Fortschritt wird nur in diesem Browser gespeichert.
+</footer>
+</main>
+
+<canvas id="confetti"></canvas>
+<div class="toast" id="toast"></div>
+
+<script>
+/* ================= Daten ================= */
+const SCENES = [
+  {t:"6:30 Uhr", x:"Der Wecker klingelt. Mia steht seit ein paar Wochen extra früher auf, damit sie genug Zeit hat, sich zu stylen."},
+  {t:"Frühstück", x:"Streit mit den Eltern: Ihnen ist Mias Pulli zu kurz und die Jeans zu kaputt. Mia gefällt genau das – sie will anders aussehen als die anderen."},
+  {t:"Schulweg", x:"Im Bus scrollt Mia durch die Storys ihrer Vorbilder und holt sich Ideen für neue Outfits."},
+  {t:"Vor dem Unterricht", x:"Ihre Clique will nach der Schule ins Kino. Eigentlich müsste Mia für Bio lernen, zum Fußballtraining und ihrem kleinen Bruder bei Mathe helfen. „Ich überleg’s mir!“"},
+  {t:"1./2. Stunde", x:"Mathearbeit! Mia ist gut vorbereitet und gibt früher ab. Ihre Lieblingslehrerin lächelt ihr zu. Mia träumt davon, selbst einmal Mathelehrerin zu werden."},
+  {t:"6. Stunde", x:"Ein Mitschüler hält ein Referat und verhaspelt sich. Jonas macht einen fiesen Witz, alle lachen – auch Mia, obwohl sie das eigentlich nicht will."},
+  {t:"Nach der Schule", x:"Mia geht doch mit ins Kino. Das Handy schaltet sie lieber aus."},
+  {t:"Abends", x:"Vier verpasste Anrufe von Mama, eine Nachricht der Trainerin. Zu Hause gibt es Streit. Es tut Mia leid, dass sie ihrem Bruder nicht geholfen hat – aber das zeigt sie nicht. Sie verschwindet in ihr Zimmer."}
+];
+
+const EXPECT = {
+  buckets:[
+    {id:"eltern", name:"Eltern", color:"#f0b323", icon:"🏠"},
+    {id:"freunde", name:"Freunde / Clique", color:"#7a2a73", icon:"👯"},
+    {id:"vorbild", name:"Vorbilder & soziale Medien", color:"#dc7a2b", icon:"📱"},
+    {id:"trainer", name:"Trainerin (Verein)", color:"#7ab648", icon:"⚽"},
+    {id:"schule", name:"Lehrerin (Schule)", color:"#4f8fb8", icon:"🏫"}
+  ],
+  items:[
+    {x:"„Zieh dir was Vernünftiges an!“", a:"eltern"},
+    {x:"„Hilf deinem Bruder beim Lernen für die Mathearbeit.“", a:"eltern"},
+    {x:"„Komm nach der Schule mit ins Kino!“", a:"freunde"},
+    {x:"„Lach mit, wenn wir einen Witz machen.“", a:"freunde"},
+    {x:"„Trag, was gerade angesagt ist.“", a:"vorbild"},
+    {x:"„Komm regelmäßig, sonst bist du am Wochenende nicht im Kader.“", a:"trainer"},
+    {x:"„Bereite dich gut auf die Arbeit vor.“", a:"schule"}
+  ]
+};
+
+const VALUES = {
+  options:[
+    "Sie will sich mit ihren Klamotten von den anderen abheben.",
+    "Sie geht mit der Clique ins Kino.",
+    "Sie ist gut auf die Mathearbeit vorbereitet.",
+    "Es tut ihr leid, dass sie ihrem Bruder nicht geholfen hat.",
+    "Sie lacht mit, obwohl sie es eigentlich nicht will."
+  ],
+  rows:[
+    {v:"Individualität", c:"#dc7a2b", a:0},
+    {v:"Freundschaft", c:"#7a2a73", a:1},
+    {v:"Leistung", c:"#4f8fb8", a:2},
+    {v:"Familie", c:"#f0b323", a:3},
+    {v:"Dazugehören", c:"#d9473b", a:4}
+  ]
+};
+
+const VQ1 = {multi:true, opts:[
+  {x:"Einzigartigkeit ↔ Gemeinsamkeiten mit anderen", ok:true},
+  {x:"Arm ↔ Reich", ok:false},
+  {x:"Beständigkeit ↔ Veränderung", ok:true},
+  {x:"Stadt ↔ Land", ok:false},
+  {x:"Innensicht (wie ich mich sehe) ↔ Außensicht (wie andere mich sehen)", ok:true}
+]};
+const VQ2 = {multi:false, opts:[{x:"In der Schule",ok:false},{x:"In der Familie",ok:true},{x:"Im Beruf",ok:false},{x:"In sozialen Medien",ok:false}]};
+const VQ3 = {multi:false, opts:[{x:"Mit dem Schulabschluss",ok:false},{x:"Mit 18 Jahren",ok:false},{x:"Nie – sie geht ein Leben lang weiter",ok:true}]};
+const MORE = {multi:true, opts:[
+  {x:"Geschwister (z. B. Mias kleiner Bruder)", ok:true},
+  {x:"Lehrerinnen und Lehrer / Schule", ok:true},
+  {x:"Trainerin und Mannschaft im Verein", ok:true},
+  {x:"Großeltern und Verwandte", ok:true},
+  {x:"Der Stundenplan", ok:false},
+  {x:"Werbung", ok:true},
+  {x:"Das Wetter", ok:false}
+]};
+
+const CLOZE = {
+  text:"Jeder Mensch möchte als {eigenständige} Person wahrgenommen und geschätzt werden. Man will {unverwechselbar} sein und sich von anderen {abheben}. Das nennt man {Ich-Identität}. Die eigene Identität ist {nie} ganz fertig – auch Erwachsene entwickeln sich weiter. Gleichzeitig ist es uns nicht egal, was {andere} von uns halten. Deshalb versuchen wir, ihre {Erwartungen} zu erfüllen, um nicht als Sonderling {ausgeschlossen} zu werden. Das nennt man {soziale Identität}.",
+  extra:["gehorsam","volljährig"]
+};
+
+const IDSORT = {
+  buckets:[
+    {id:"ich", name:"Ich-Identität", color:"#4f8fb8", icon:"🙋"},
+    {id:"soz", name:"Soziale Identität", color:"#d9473b", icon:"👥"}
+  ],
+  items:[
+    {x:"Mia trägt bewusst andere Klamotten als alle anderen.", a:"ich", why:"Sie will unverwechselbar sein – das ist ihr eigener Wunsch."},
+    {x:"Mia möchte Mathelehrerin werden, weil ihr Zahlen Spaß machen.", a:"ich", why:"Der Berufswunsch kommt aus ihren eigenen Interessen."},
+    {x:"Mia lacht über den Witz, obwohl sie ihn gemein findet.", a:"soz", why:"Sie passt sich der Gruppe an, um nicht aufzufallen."},
+    {x:"Mia geht mit ins Kino, damit sie in der Clique dazugehört.", a:"soz", why:"Sie erfüllt die Erwartung ihrer Freunde."},
+    {x:"Mia holt sich Outfit-Ideen bei ihren Vorbildern im Netz.", a:"soz", why:"Andere geben vor, was als schön oder angesagt gilt."},
+    {x:"Ich höre meine Lieblingsmusik – auch wenn meine Freunde sie peinlich finden.", a:"ich", why:"Hier zählt der eigene Geschmack mehr als die Meinung der anderen."},
+    {x:"Ich kaufe die Marke, die gerade alle in meiner Klasse tragen.", a:"soz", why:"Man orientiert sich an der Gruppe, um dazuzugehören."},
+    {x:"Ich gehe in die Theater-AG, weil ich gern auf der Bühne stehe.", a:"ich", why:"Die Entscheidung kommt aus eigenem Interesse."},
+    {x:"Ich poste nur Fotos, auf denen ich so aussehe, wie es die anderen cool finden.", a:"soz", why:"Das Selbstbild richtet sich nach der Bewertung anderer (Likes)."}
+  ]
+};
+
+const TOOMUCH = {
+  buckets:[
+    {id:"ich", name:"Ich-Identität zu stark", color:"#4f8fb8", icon:"🙋‍♀️"},
+    {id:"soz", name:"Soziale Identität zu stark", color:"#d9473b", icon:"👥"}
+  ],
+  items:[
+    {x:"Man nimmt kaum Rücksicht auf andere.", a:"ich", why:"Wer nur an die eigenen Wünsche denkt, übersieht leicht die Bedürfnisse anderer."},
+    {x:"Man wird schnell zum Außenseiter.", a:"ich", why:"Wer sich nie anpasst, eckt oft an."},
+    {x:"Zusammenarbeit im Team fällt schwer.", a:"ich", why:"Teamarbeit braucht Kompromisse."},
+    {x:"Man weiß irgendwann nicht mehr, was man selbst eigentlich will.", a:"soz", why:"Wer sich ständig anpasst, verliert den Kontakt zu den eigenen Wünschen."},
+    {x:"Man macht Dinge mit, die man eigentlich falsch findet.", a:"soz", why:"Gruppendruck setzt sich gegen die eigene Meinung durch."},
+    {x:"Man wird abhängig von Likes und Lob.", a:"soz", why:"Das Selbstwertgefühl hängt dann vor allem von anderen ab."}
+  ]
+};
+
+const BLITZ = [
+  {x:"Mit 18 Jahren ist die eigene Identität fertig ausgebildet.", a:0, e:"Falsch – auch Erwachsene entwickeln sich weiter."},
+  {x:"Andere Menschen beeinflussen, wie wir uns selbst sehen.", a:1, e:"Richtig – es ist uns nicht egal, was andere von uns halten."},
+  {x:"Ich-Identität bedeutet, so zu sein wie alle anderen.", a:0, e:"Falsch – es geht darum, unverwechselbar zu sein."},
+  {x:"Soziale Identität entsteht unter anderem, weil wir dazugehören wollen.", a:1, e:"Richtig – niemand möchte ausgeschlossen werden."},
+  {x:"Soziale Medien können beeinflussen, was wir schön oder angesagt finden.", a:1, e:"Richtig – denk an Mias Vorbilder."},
+  {x:"Wer Erwartungen anderer erfüllt, hat keine eigene Identität.", a:0, e:"Falsch – jede Identität hat beide Seiten."},
+  {x:"Erwartungen verschiedener Menschen können sich widersprechen.", a:1, e:"Richtig – bei Mia z. B. Clique (Kino) gegen Mutter (Bruder helfen)."},
+  {x:"Nur die Eltern haben Einfluss auf unsere Identität.", a:0, e:"Falsch – auch Freunde, Schule, Vorbilder, Medien …"}
+];
+
+const DILEMMAS = [
+  {id:"d1", x:"Deine Freunde wollen am Samstag in die Stadt. Du hast aber Training – und das Spiel am Sonntag ist wichtig.", c:["Ich gehe zum Training.","Ich gehe mit in die Stadt.","Ich suche einen Kompromiss."]},
+  {id:"d2", x:"Alle in deiner Gruppe finden eine neue Serie super. Du findest sie langweilig.", c:["Ich sage ehrlich meine Meinung.","Ich sage lieber nichts.","Ich tu so, als fände ich sie gut."]},
+  {id:"d3", x:"Ein Influencer, dem du folgst, wirbt für teure Sneaker. Viele in deiner Klasse haben sie schon.", c:["Ich will sie auch haben.","Ich kaufe sie nicht.","Ich überlege, warum ich sie will."]}
+];
+
+const BUILDER = [
+  {k:"Eltern", c:"#f0b323"},{k:"Freunde", c:"#7a2a73"},{k:"Vorbilder", c:"#d9473b"},
+  {k:"soziale Medien", c:"#dc7a2b"},{k:"", c:"#7ab648", own:true}
+];
+
+/* ================= Zustand ================= */
+const KEY = "identitaet-ab-v1";
+let S = {};
+try { S = JSON.parse(localStorage.getItem(KEY)) || {}; } catch(e) { S = {}; }
+S.score = S.score || {}; S.inputs = S.inputs || {};
+function save(){ try { localStorage.setItem(KEY, JSON.stringify(S)); } catch(e){} }
+
+const MAX = {order:40, expect:35, values:25, vq1:15, cloze:45, idsort:45, vq23:10, more:30, blitz:52, toomuch:30};
+const XPMAX = Object.values(MAX).reduce((a,b)=>a+b,0);
+const STATION_TASKS = {s1:["order","expect","values"], s2:["vq1","cloze"], s3:["idsort"], s4:["vq23","more"], s5:["blitz"], s6:["toomuch"]};
+const BADGES = [
+  {s:"s1", n:"Fall-Detektiv", i:"🔎"},{s:"s2", n:"Begriffs-Profi", i:"📚"},{s:"s3", n:"Sortier-Ass", i:"🧩"},
+  {s:"s4", n:"Schaubild-Kenner", i:"🗺️"},{s:"s5", n:"Blitzmerker", i:"⚡"},{s:"s6", n:"Diskussions-Champion", i:"💬"}
+];
+
+function award(task, pts){
+  const old = S.score[task] || 0;
+  if(pts > old){ S.score[task] = pts; save(); toast("+" + (pts-old) + " XP"); if(pts >= MAX[task]) setTimeout(()=>confetti(), 150); }
+  updateXP();
+}
+function updateXP(){
+  const xp = Object.values(S.score).reduce((a,b)=>a+b,0);
+  document.getElementById("xp").textContent = xp;
+  document.getElementById("xpmax").textContent = XPMAX;
+  document.getElementById("xpfill").style.width = Math.min(100, xp/XPMAX*100) + "%";
+  document.querySelectorAll("#map a[data-s]").forEach(a=>{
+    const t = STATION_TASKS[a.dataset.s];
+    a.classList.toggle("done", t.every(k => (S.score[k]||0) > 0));
+  });
+  renderResult();
+}
+function fb(id, ok, msg){ const el=document.getElementById("fb-"+id); el.textContent=msg; el.className="feedback "+(ok?"ok":"bad"); }
+function shuffle(a){ a=a.slice(); for(let i=a.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[a[i],a[j]]=[a[j],a[i]];} return a; }
+function esc(s){ return String(s).replace(/[&<>"]/g, c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c])); }
+let toastT;
+function toast(m){ const t=document.getElementById("toast"); t.textContent=m; t.classList.add("show"); clearTimeout(toastT); toastT=setTimeout(()=>t.classList.remove("show"),1400); }
+
+/* Navigation */
+(function(){
+  const map=document.getElementById("map");
+  ["s1","s2","s3","s4","s5","s6"].forEach((s,i)=>{ const a=document.createElement("a"); a.href="#"+s; a.dataset.s=s; a.textContent=i+1; a.title="Station "+(i+1); map.appendChild(a); });
+  const r=document.createElement("a"); r.href="#result"; r.textContent="★"; r.title="Ergebnis"; map.appendChild(r);
+})();
+
+/* Name & freie Eingaben speichern */
+const nameEl=document.getElementById("name");
+nameEl.value=S.name||""; nameEl.addEventListener("input",()=>{S.name=nameEl.value; save(); renderResult();});
+document.querySelectorAll("[data-save]").forEach(el=>{
+  if(S.inputs[el.id]!==undefined) el.value=S.inputs[el.id];
+  el.addEventListener("input",()=>{ S.inputs[el.id]=el.value; save(); renderResult(); });
+});
+
+/* ================= Aufgabe: Reihenfolge ================= */
+let orderIdx = S.order || shuffle(SCENES.map((_,i)=>i));
+if(orderIdx.every((v,i)=>v===i)) orderIdx = shuffle(orderIdx);
+function renderOrder(){
+  const box=document.getElementById("order"); box.innerHTML="";
+  orderIdx.forEach((si,pos)=>{
+    const d=document.createElement("div"); d.className="scene";
+    d.innerHTML=`<div class="time">${esc(SCENES[si].t)}</div><div>${esc(SCENES[si].x)}</div>
+      <div class="ctrl"><button aria-label="nach oben" data-mv="-1">▲</button><button aria-label="nach unten" data-mv="1">▼</button></div>`;
+    d.querySelectorAll("[data-mv]").forEach(b=>b.onclick=()=>{
+      const np=pos+ +b.dataset.mv; if(np<0||np>=orderIdx.length) return;
+      [orderIdx[pos],orderIdx[np]]=[orderIdx[np],orderIdx[pos]]; S.order=orderIdx; save(); renderOrder();
+    });
+    box.appendChild(d);
+  });
+}
+renderOrder();
+function checkOrder(){
+  let n=0; [...document.querySelectorAll("#order .scene")].forEach((d,pos)=>{
+    const ok=orderIdx[pos]===pos; if(ok) n++; d.classList.toggle("right",ok); d.classList.toggle("wrong",!ok);
+  });
+  award("order", n*5);
+  fb("order", n===SCENES.length, n===SCENES.length ? "Perfekt! Mias Tag ist richtig sortiert." : `${n} von ${SCENES.length} Szenen stehen richtig. Die roten Szenen musst du noch verschieben.`);
+}
+
+/* ================= Aufgabe: Zuordnen (Buckets, generisch) ================= */
+const bucketState = {};
+function makeBuckets(id, cfg){
+  const root=document.getElementById(id);
+  const st = bucketState[id] = {cfg, place:{}, sel:null};
+  const saved = (S.buckets||{})[id]; if(saved) st.place = saved;
+  root.innerHTML=`<div class="pool" data-b="__pool"></div><div class="buckets">${cfg.buckets.map(b=>
+    `<div class="bucket" data-b="${b.id}" style="--bc:${b.color}"><h4><span>${b.icon}</span>${esc(b.name)}</h4><div class="items"></div></div>`).join("")}</div>`;
+  st.order = shuffle(cfg.items.map((_,i)=>i));
+  const drop = (zone)=>{
+    if(st.sel===null) return;
+    const b = zone.dataset.b; if(b==="__pool") delete st.place[st.sel]; else st.place[st.sel]=b;
+    st.sel=null; persist(); render();
+  };
+  root.querySelectorAll("[data-b]").forEach(z=>{
+    z.addEventListener("click",e=>{ if(e.target.closest(".chip")) return; drop(z); });
+    z.addEventListener("dragover",e=>{e.preventDefault(); z.classList.add("over");});
+    z.addEventListener("dragleave",()=>z.classList.remove("over"));
+    z.addEventListener("drop",e=>{e.preventDefault(); z.classList.remove("over"); st.sel=+e.dataTransfer.getData("text/plain"); drop(z);});
+  });
+  function persist(){ S.buckets=S.buckets||{}; S.buckets[id]=st.place; save(); }
+  function render(){
+    root.querySelectorAll(".pool, .bucket .items").forEach(z=>z.innerHTML="");
+    st.order.forEach(i=>{
+      const it=cfg.items[i]; const c=document.createElement("div"); c.className="chip"; c.draggable=true;
+      c.innerHTML=esc(it.x)+(st.checked && it.why && st.place[i] ? `<span class="why">${esc(it.why)}</span>`:"");
+      if(st.sel===i) c.classList.add("sel");
+      if(st.checked && st.place[i]) c.classList.add(st.place[i]===it.a?"right":"wrong");
+      c.addEventListener("click",e=>{
+        e.stopPropagation();
+        const zone=c.closest("[data-b]");
+        // Ist schon eine andere Karte gewählt und liegt diese Karte in einem anderen Feld → gewählte Karte dorthin legen
+        if(st.sel!==null && st.sel!==i && (st.place[st.sel]||"__pool")!==zone.dataset.b){ drop(zone); return; }
+        st.sel = st.sel===i?null:i; render(); });
+      c.addEventListener("dragstart",e=>{ e.dataTransfer.setData("text/plain", i); st.sel=i; });
+      const target = st.place[i] ? root.querySelector(`.bucket[data-b="${st.place[i]}"] .items`) : root.querySelector(".pool");
+      target.appendChild(c);
+    });
+    root.querySelectorAll(".bucket").forEach(b=>b.classList.toggle("armed", st.sel!==null));
+    const pool=root.querySelector(".pool"); if(!pool.children.length) pool.innerHTML='<span class="hint" style="margin:0">Alle Karten verteilt – jetzt prüfen!</span>';
+  }
+  st.render=()=>{ st.checked=false; render(); };
+  st.check=()=>{ st.checked=true; render(); let n=0; cfg.items.forEach((it,i)=>{ if(st.place[i]===it.a) n++; }); return n; };
+  st.reset=()=>{ st.place={}; st.sel=null; st.checked=false; persist(); render(); };
+  render();
+}
+makeBuckets("expect", EXPECT);
+makeBuckets("idsort", IDSORT);
+makeBuckets("toomuch", TOOMUCH);
+function checkBucket(id, per){
+  const st=bucketState[id], n=st.check(), tot=st.cfg.items.length;
+  const placed=Object.keys(st.place).length;
+  award(id, n*per);
+  if(placed<tot) fb(id,false,`Es sind noch ${tot-placed} Karten übrig. Bisher richtig: ${n}.`);
+  else fb(id, n===tot, n===tot ? "Alles richtig – stark!" : `${n} von ${tot} richtig. Verschiebe die roten Karten und prüfe nochmal.`);
+}
+
+/* ================= Aufgabe: Werte-Belege ================= */
+(function(){
+  const box=document.getElementById("values");
+  VALUES.rows.forEach((r,i)=>{
+    const row=document.createElement("div"); row.className="row";
+    row.innerHTML=`<div class="val" style="background:${r.c}">${esc(r.v)}</div>
+      <select data-i="${i}"><option value="">– Textstelle wählen –</option>${VALUES.options.map((o,j)=>`<option value="${j}">${esc(o)}</option>`).join("")}</select>`;
+    const sel=row.querySelector("select"); const sv=(S.inputs.values||{})[i]; if(sv!==undefined) sel.value=sv;
+    sel.onchange=()=>{ S.inputs.values=S.inputs.values||{}; S.inputs.values[i]=sel.value; save(); sel.className=""; };
+    box.appendChild(row);
+  });
+})();
+function checkValues(){
+  let n=0; document.querySelectorAll("#values select").forEach(s=>{
+    const ok = s.value!=="" && +s.value===VALUES.rows[+s.dataset.i].a; if(ok)n++; s.className = s.value===""?"":(ok?"right":"wrong");
+  });
+  award("values", n*5);
+  fb("values", n===5, n===5 ? "Super, alle Belege passen!" : `${n} von 5 Belegen passen.`);
+}
+
+/* ================= Aufgabe: Auswahl (MC) ================= */
+function makeOpts(id, cfg){
+  const box=document.getElementById(id);
+  const order=shuffle(cfg.opts.map((_,i)=>i));
+  order.forEach(i=>{
+    const o=cfg.opts[i]; const l=document.createElement("label"); l.className="opt";
+    l.innerHTML=`<input type="${cfg.multi?"checkbox":"radio"}" name="${id}" value="${i}"> <span>${esc(o.x)}</span>`;
+    l.querySelector("input").addEventListener("change",()=>box.querySelectorAll(".opt").forEach(x=>x.classList.remove("right","wrong","missed")));
+    box.appendChild(l);
+  });
+}
+function evalOpts(id, cfg){
+  let right=0, wrong=0, total=cfg.opts.filter(o=>o.ok).length;
+  document.querySelectorAll(`#${id} .opt`).forEach(l=>{
+    const inp=l.querySelector("input"), o=cfg.opts[+inp.value];
+    l.classList.remove("right","wrong","missed");
+    if(inp.checked && o.ok){ right++; l.classList.add("right"); }
+    else if(inp.checked && !o.ok){ wrong++; l.classList.add("wrong"); }
+  });
+  return {right, wrong, total};
+}
+function markMissed(id,cfg){ document.querySelectorAll(`#${id} .opt`).forEach(l=>{ const inp=l.querySelector("input"); if(!inp.checked && cfg.opts[+inp.value].ok) l.classList.add("missed"); }); }
+makeOpts("vq1",VQ1); makeOpts("vq2",VQ2); makeOpts("vq3",VQ3); makeOpts("more",MORE);
+
+function checkVQ1(){
+  const r=evalOpts("vq1",VQ1); const pts=Math.max(0,r.right-r.wrong)*5; award("vq1",pts);
+  const ok=r.right===3&&r.wrong===0;
+  fb("vq1", ok, ok?"Genau – diese drei Spannungsfelder nennt das Video.":`${r.right} richtig, ${r.wrong} falsch angekreuzt. Schau dir das Video ggf. noch einmal an.`);
+}
+function checkVQ23(){
+  const a=evalOpts("vq2",VQ2), b=evalOpts("vq3",VQ3); const n=(a.right&&!a.wrong?1:0)+(b.right&&!b.wrong?1:0);
+  award("vq23", n*5);
+  fb("vq23", n===2, n===2 ? "Richtig! Sozialisation beginnt in der Familie und hört nie auf." : `${n} von 2 richtig.`);
+}
+function checkMore(){
+  const r=evalOpts("more",MORE); const pts=Math.max(0,r.right-r.wrong)*6; award("more",pts);
+  const ok=r.right===r.total&&r.wrong===0;
+  if(!ok) markMissed("more",MORE);
+  fb("more", ok, ok?"Klasse! All diese Gruppen prägen uns mit.":`${r.right} von ${r.total} gefunden${r.wrong?`, ${r.wrong} passen nicht`:""}. Gelb = hast du übersehen.`);
+}
+
+/* ================= Aufgabe: Lückentext ================= */
+const clozeAns=[]; let clozeFill = S.cloze || {}; let selGap=null;
+(function(){
+  const box=document.getElementById("cloze");
+  box.innerHTML = esc(CLOZE.text).replace(/\{([^}]+)\}/g,(m,w)=>{ clozeAns.push(w); return `<span class="gap" data-g="${clozeAns.length-1}" tabindex="0"></span>`; });
+  const words=shuffle(clozeAns.concat(CLOZE.extra));
+  const bank=document.getElementById("bank");
+  words.forEach(w=>{ const c=document.createElement("span"); c.className="chip"; c.textContent=w; c.dataset.w=w; c.draggable=true;
+    c.onclick=()=>{ let g=selGap; if(g===null){ g=clozeAns.findIndex((_,i)=>!clozeFill[i]); if(g<0) return; } fillGap(g,w); };
+    c.addEventListener("dragstart",e=>e.dataTransfer.setData("text/plain",w));
+    bank.appendChild(c); });
+  box.querySelectorAll(".gap").forEach(g=>{
+    g.onclick=()=>{ const i=+g.dataset.g; if(clozeFill[i]){ delete clozeFill[i]; selGap=i; } else selGap = selGap===i?null:i; persistCloze(); renderCloze(); };
+    g.addEventListener("keydown",e=>{ if(e.key==="Enter"||e.key===" "){e.preventDefault(); g.click();} });
+    g.addEventListener("dragover",e=>e.preventDefault());
+    g.addEventListener("drop",e=>{ e.preventDefault(); fillGap(+g.dataset.g, e.dataTransfer.getData("text/plain")); });
+  });
+  renderCloze();
+})();
+function fillGap(i,w){
+  for(const k in clozeFill) if(clozeFill[k]===w) delete clozeFill[k];
+  clozeFill[i]=w; selGap=null;
+  const next=clozeAns.findIndex((_,j)=>!clozeFill[j]); selGap = next>=0?next:null;
+  persistCloze(); renderCloze();
+}
+function persistCloze(){ S.cloze=clozeFill; save(); }
+function renderCloze(checked){
+  document.querySelectorAll("#cloze .gap").forEach(g=>{ const i=+g.dataset.g; g.textContent=clozeFill[i]||" "; g.className="gap"+(selGap===i?" sel":"");
+    if(checked && clozeFill[i]) g.classList.add(clozeFill[i]===clozeAns[i]?"right":"wrong"); });
+  const used=Object.values(clozeFill);
+  document.querySelectorAll("#bank .chip").forEach(c=>c.classList.toggle("used", used.includes(c.dataset.w)));
+}
+function checkCloze(){
+  let n=0; clozeAns.forEach((a,i)=>{ if(clozeFill[i]===a) n++; }); renderCloze(true);
+  award("cloze", n*5);
+  fb("cloze", n===clozeAns.length, n===clozeAns.length ? "Alles richtig! Du kennst jetzt beide Seiten der Identität." : `${n} von ${clozeAns.length} Lücken richtig. Tippe rote Lücken an, um sie zu leeren.`);
+}
+
+/* ================= Video (Klick zum Laden) ================= */
+document.querySelectorAll(".video[data-yt]").forEach(v=>{
+  v.innerHTML=`<div class="vposter" role="button" tabindex="0"><div class="play"></div><b>${esc(v.dataset.title)}</b>
+    <small>Beim Abspielen wird eine Verbindung zu YouTube hergestellt.</small></div>`;
+  const load=()=>{ v.innerHTML=`<iframe src="https://www.youtube-nocookie.com/embed/${v.dataset.yt}?autoplay=1&rel=0" title="${esc(v.dataset.title)}" allow="autoplay; encrypted-media; picture-in-picture; fullscreen" allowfullscreen></iframe>`; };
+  const p=v.querySelector(".vposter"); p.onclick=load; p.onkeydown=e=>{ if(e.key==="Enter") load(); };
+});
+
+/* ================= Einfluss-Schaubild ================= */
+S.builder = S.builder || BUILDER.map(b=>({v:2, ex:"", name:b.own?"":b.k}));
+(function(){
+  const box=document.getElementById("builder");
+  BUILDER.forEach((b,i)=>{
+    const d=S.builder[i]; const row=document.createElement("div"); row.className="brow";
+    row.innerHTML=`<div class="lbl" style="background:${b.c}">${b.own?`<input type="text" placeholder="eigene Idee …" value="${esc(d.name)}" data-k="name">`:esc(b.k)}</div>
+      <div><input type="range" min="0" max="5" value="${d.v}" data-k="v" aria-label="Einfluss ${esc(b.k||"eigene Idee")}"></div>
+      <input type="text" placeholder="Beispiel: …" value="${esc(d.ex)}" data-k="ex">`;
+    row.querySelectorAll("[data-k]").forEach(inp=>inp.addEventListener("input",()=>{ d[inp.dataset.k]= inp.dataset.k==="v" ? +inp.value : inp.value; save(); drawDiagram(); renderResult(); }));
+    box.appendChild(row);
+  });
+  drawDiagram();
+})();
+function wrap(t,n){ const w=t.split(" "),out=[];let l=""; w.forEach(x=>{ if((l+" "+x).trim().length>n){ if(l) out.push(l); l=x; } else l=(l+" "+x).trim(); }); if(l) out.push(l); return out.slice(0,2); }
+function drawDiagram(target){
+  const svg = target || document.getElementById("myDiagram");
+  const cx=320, cy=200;
+  const pos=[{x:320,y:40},{x:120,y:80},{x:520,y:80},{x:110,y:290},{x:530,y:290}];
+  let h=`<defs>${BUILDER.map((b,i)=>`<marker id="m${i}${target?"r":""}" viewBox="0 0 10 10" refX="7" refY="5" markerWidth="3" markerHeight="3" orient="auto"><path d="M0,0L10,5L0,10z" fill="${b.c}"/></marker>`).join("")}</defs>`;
+  BUILDER.forEach((b,i)=>{
+    const d=S.builder[i], p=pos[i]; if(d.v>0){
+      const dx=cx-p.x, dy=cy-p.y, L=Math.hypot(dx,dy), ux=dx/L, uy=dy/L;
+      h+=`<line x1="${p.x+ux*50}" y1="${p.y+uy*30}" x2="${cx-ux*80}" y2="${cy-uy*48}" stroke="${b.c}" stroke-width="${d.v*3.2}" marker-end="url(#m${i}${target?"r":""})" opacity=".9"/>`;
+    }
+  });
+  BUILDER.forEach((b,i)=>{
+    const d=S.builder[i], p=pos[i], nm=(b.own?(d.name||"…"):b.k);
+    h+=`<rect x="${p.x-62}" y="${p.y-22}" width="124" height="44" rx="10" fill="${b.c}" opacity="${d.v===0?.35:1}"/>
+       <text x="${p.x}" y="${p.y+5}" text-anchor="middle" fill="#fff" font-weight="700" font-size="14">${esc(nm.slice(0,18))}</text>`;
+    if(d.ex) wrap(d.ex,24).forEach((ln,k)=>{ h+=`<text x="${p.x}" y="${p.y+38+k*14}" text-anchor="middle" fill="#5c6b78" font-size="11">${esc(ln)}</text>`; });
+  });
+  h+=`<ellipse cx="${cx}" cy="${cy}" rx="75" ry="44" fill="#4f8fb8"/><text x="${cx}" y="${cy+8}" text-anchor="middle" fill="#fff" font-weight="800" font-size="22">${esc((S.name||"Ich").slice(0,14))}</text>`;
+  svg.innerHTML=h;
+}
+
+/* ================= Blitzrunde ================= */
+let B = {i:0, streak:0, pts:0, order:shuffle(BLITZ.map((_,i)=>i)), lock:false};
+function showBlitz(){
+  document.getElementById("btot").textContent=BLITZ.length;
+  const card=document.getElementById("bcard"); card.className="bcard";
+  if(B.i>=BLITZ.length){
+    card.textContent=`Fertig! ${B.pts} XP in dieser Runde 🎉`; document.getElementById("bbtns").style.visibility="hidden";
+    award("blitz", B.pts); return;
+  }
+  document.getElementById("bbtns").style.visibility="visible";
+  document.getElementById("bnum").textContent=B.i+1; document.getElementById("bstreak").textContent=B.streak+(B.streak>=3?" 🔥":"");
+  card.textContent=BLITZ[B.order[B.i]].x; document.getElementById("fb-blitz").textContent="";
+}
+document.querySelectorAll("[data-tf]").forEach(b=>b.onclick=()=>{
+  if(B.lock||B.i>=BLITZ.length) return; B.lock=true;
+  const q=BLITZ[B.order[B.i]], ok=(+b.dataset.tf===q.a), card=document.getElementById("bcard");
+  if(ok){ B.streak++; B.pts += 5 + (B.streak>=3?2:0); card.classList.add("ok"); } else { B.streak=0; card.classList.add("no"); }
+  fb("blitz", ok, q.e);
+  setTimeout(()=>{ B.i++; B.lock=false; showBlitz(); }, 1700);
+});
+document.getElementById("brestart").onclick=()=>{ B={i:0,streak:0,pts:0,order:shuffle(BLITZ.map((_,i)=>i)),lock:false}; showBlitz(); };
+showBlitz();
+
+/* ================= Dilemmata ================= */
+S.inputs.dil = S.inputs.dil || {};
+(function(){
+  const box=document.getElementById("dilemmas");
+  DILEMMAS.forEach(d=>{
+    const st=S.inputs.dil[d.id]=S.inputs.dil[d.id]||{c:null,t:""};
+    const el=document.createElement("div"); el.className="dilemma";
+    el.innerHTML=`<b>${esc(d.x)}</b><div class="choices">${d.c.map((c,i)=>`<button type="button" data-c="${i}">${esc(c)}</button>`).join("")}</div>
+      <textarea placeholder="Weil …" style="min-height:60px">${esc(st.t)}</textarea>`;
+    const btns=el.querySelectorAll("[data-c]"); const paint=()=>btns.forEach(b=>b.classList.toggle("on", +b.dataset.c===st.c));
+    btns.forEach(b=>b.onclick=()=>{ st.c=+b.dataset.c; save(); paint(); renderResult(); });
+    el.querySelector("textarea").oninput=e=>{ st.t=e.target.value; save(); renderResult(); };
+    paint(); box.appendChild(el);
+  });
+})();
+
+/* ================= Prüfen / Reset Buttons ================= */
+const CHECKS={order:checkOrder, expect:()=>checkBucket("expect",5), values:checkValues, vq1:checkVQ1, cloze:checkCloze,
+  idsort:()=>checkBucket("idsort",5), vq23:checkVQ23, more:checkMore, toomuch:()=>checkBucket("toomuch",5)};
+document.querySelectorAll("[data-check]").forEach(b=>b.onclick=()=>CHECKS[b.dataset.check]());
+document.querySelectorAll("[data-reset]").forEach(b=>b.onclick=()=>{
+  const k=b.dataset.reset;
+  if(k==="cloze"){ clozeFill={}; selGap=null; persistCloze(); renderCloze(); }
+  else bucketState[k].reset();
+  document.getElementById("fb-"+k).textContent="";
+});
+document.getElementById("resetAll").onclick=()=>{
+  if(!confirm("Wirklich alles löschen und neu anfangen?")) return;
+  try{ localStorage.removeItem(KEY); }catch(e){} location.hash=""; location.reload();
+};
+
+/* ================= Ergebnis ================= */
+function renderResult(){
+  const xp=Object.values(S.score).reduce((a,b)=>a+b,0);
+  const pct=Math.round(xp/XPMAX*100);
+  const rank = pct>=90?"Identitäts-Expert:in 🏆": pct>=70?"Sehr gut unterwegs ⭐": pct>=40?"Auf gutem Weg 👍":"Starte durch 🚀";
+  document.getElementById("resline").innerHTML = `<b>${esc(S.name||"Ohne Namen")}</b> hat <b>${xp} von ${XPMAX} XP</b> (${pct} %) gesammelt – Rang: <b>${rank}</b>`;
+  document.getElementById("badges").innerHTML = BADGES.map(b=>{
+    const on=STATION_TASKS[b.s].every(k=>(S.score[k]||0)>=MAX[k]);
+    return `<span class="bdg ${on?"on":""}" title="${on?"freigeschaltet":"alle Aufgaben der Station fehlerfrei lösen"}"><i>${on?b.i:"🔒"}</i>${esc(b.n)}</span>`; }).join("");
+  const baro=+(S.inputs.baro||5);
+  const baroTxt = baro<=3?"eher den eigenen Weg gehen": baro>=7?"eher Erwartungen anderer erfüllen":"beides ungefähr gleich wichtig";
+  const dils = DILEMMAS.map(d=>{ const s=(S.inputs.dil||{})[d.id]||{}; return s.c===null||s.c===undefined?"–":`${d.c[s.c]}${s.t?" ("+s.t+")":""}`; });
+  const infl = BUILDER.map((b,i)=>{ const d=S.builder[i]; const n=b.own?(d.name||"eigene Idee"):b.k; return `${n}: ${d.v}/5${d.ex?" – "+d.ex:""}`; });
+  document.getElementById("summary").innerHTML = `
+    <dt>Vergleich mit Mia</dt><dd>${esc(S.inputs["t-compare"]||"–")}</dd>
+    <dt>Mein Einfluss-Schaubild</dt><dd>${infl.map(esc).join("<br>")}</dd>
+    <dd><svg id="resDiagram" viewBox="0 0 640 360" style="width:100%;max-width:480px"></svg></dd>
+    <dt>Meine Entscheidungen</dt><dd>${dils.map((t,i)=>`${i+1}. ${esc(t)}`).join("<br>")}</dd>
+    <dt>Meinungsbarometer</dt><dd>${baro}/10 → ${baroTxt}</dd>
+    <dt>Meine Argumente</dt><dd>${esc(S.inputs["t-opinion"]||"–")}</dd>`;
+  drawDiagram(document.getElementById("resDiagram"));
+}
+
+/* ================= Konfetti ================= */
+function confetti(){
+  const c=document.getElementById("confetti"), x=c.getContext("2d"); c.width=innerWidth; c.height=innerHeight;
+  const cols=["#f0b323","#7a2a73","#d9473b","#dc7a2b","#7ab648","#4f8fb8"];
+  const P=Array.from({length:110},()=>({x:innerWidth/2,y:innerHeight*0.35,vx:(Math.random()-.5)*14,vy:Math.random()*-12-3,s:Math.random()*7+4,c:cols[Math.floor(Math.random()*6)],r:Math.random()*6}));
+  let f=0; (function step(){ x.clearRect(0,0,c.width,c.height);
+    P.forEach(p=>{ p.vy+=.35; p.x+=p.vx; p.y+=p.vy; p.r+=.2; x.save(); x.translate(p.x,p.y); x.rotate(p.r); x.fillStyle=p.c; x.fillRect(-p.s/2,-p.s/2,p.s,p.s*.6); x.restore(); });
+    if(++f<110) requestAnimationFrame(step); else x.clearRect(0,0,c.width,c.height); })();
+}
+
+updateXP();
+</script>
+</body>
+</html>
